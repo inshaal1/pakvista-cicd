@@ -1,21 +1,19 @@
-name: CI – Development
+name: CI – Staging
 
 on:
   pull_request:
     branches:
-      - develop
+      - staging
 
 jobs:
-  ci-dev:
-    name: Build & Push Dev Image
+  ci-staging:
+    name: Build & Push Staging Image
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1 – Checkout
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2 – Lint HTML & CSS
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -30,29 +28,26 @@ jobs:
       - name: Lint CSS with Stylelint
         run: npx stylelint "*.css"
 
-      # Step 3 – Docker Login
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Step 4 – Build Image (no push)
       - name: Build Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: false
           tags: |
-            inshaalbutt/pakvista:dev-latest
-            inshaalbutt/pakvista:dev-${{ github.sha }}
+            inshaalbutt/pakvista:staging-latest
+            inshaalbutt/pakvista:staging-${{ github.sha }}
 
-      # Step 5 & 6 – Tag & Push Image
       - name: Push Docker image to Docker Hub
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
           tags: |
-            inshaalbutt/pakvista:dev-latest
-            inshaalbutt/pakvista:dev-${{ github.sha }}
+            inshaalbutt/pakvista:staging-latest
+            inshaalbutt/pakvista:staging-${{ github.sha }}
