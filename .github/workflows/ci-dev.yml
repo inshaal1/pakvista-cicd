@@ -1,13 +1,13 @@
-name: CI – Development
+name: CI – Production
 
 on:
   pull_request:
     branches:
-      - develop
+      - main
 
 jobs:
-  ci-dev:
-    name: Build & Push Dev Image
+  ci-prod:
+    name: Build & Push Prod Image
     runs-on: ubuntu-latest
 
     steps:
@@ -15,24 +15,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2 – Lint HTML & CSS, Build with Parcel
+      # Step 2 – Lint HTML & CSS
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Install linting & build tools
-        run: |
-          npm install --save-dev htmlhint stylelint stylelint-config-standard parcel
+      - name: Install linting tools
+        run: npm install --save-dev htmlhint stylelint stylelint-config-standard
 
       - name: Lint HTML with HTMLHint
         run: npx htmlhint "*.html"
 
       - name: Lint CSS with Stylelint
         run: npx stylelint "*.css"
-
-      - name: Build with Parcel
-        run: npx parcel build index.html --no-optimize --dist-dir dist
 
       # Step 3 – Docker Login
       - name: Log in to Docker Hub
@@ -48,8 +44,8 @@ jobs:
           context: .
           push: false
           tags: |
-            inshaal1/pakvista:dev-latest
-            inshaal1/pakvista:dev-${{ github.sha }}
+            inshaal1/pakvista:prod-latest
+            inshaal1/pakvista:prod-${{ github.sha }}
 
       # Step 5 & 6 – Tag & Push Image
       - name: Push Docker image to Docker Hub
@@ -58,5 +54,5 @@ jobs:
           context: .
           push: true
           tags: |
-            inshaal1/pakvista:dev-latest
-            inshaal1/pakvista:dev-${{ github.sha }}
+            inshaal1/pakvista:prod-latest
+            inshaal1/pakvista:prod-${{ github.sha }}
