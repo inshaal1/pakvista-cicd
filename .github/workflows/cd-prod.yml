@@ -1,0 +1,29 @@
+name: CD – Production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  cd-prod:
+    name: Deploy to Render Production
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      # Step 1 – Checkout
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2 – Environment is declared above at job level (environment: production)
+      # This injects the RENDER_DEPLOY_HOOK_PROD_URL secret automatically
+
+      # Step 3 – Deploy via Render Deploy Hook
+      - name: Trigger Render production deployment
+        run: |
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_PROD_URL }}"
+
+      # Step 4 – Confirm deployment
+      - name: Confirm deployment
+        run: echo "Deployment to production triggered at $(date)"
